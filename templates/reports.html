@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Отчёты{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="bi bi-file-earmark-text"></i> Отчёты по качеству воздуха</h1>
+    </div>
+</div>
+
+{% for report in reports %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-{{ report.analysis.overall_status|status_class }} text-white">
+                <h4>
+                    <i class="bi bi-door-open"></i> {{ report.room.name }}
+                    <span class="badge bg-light text-dark float-end">
+                        Статус: {{ report.analysis.overall_status }}
+                    </span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted">Температура</h6>
+                            <h4 class="text-{{ report.analysis.parameters.temperature.status|status_class }}">
+                                {{ "%.1f"|format(report.analysis.parameters.temperature.value) if report.analysis.parameters.temperature.value else 'N/A' }}°C
+                            </h4>
+                            <small>{{ report.analysis.parameters.temperature.message }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted">Влажность</h6>
+                            <h4 class="text-{{ report.analysis.parameters.humidity.status|status_class }}">
+                                {{ "%.1f"|format(report.analysis.parameters.humidity.value) if report.analysis.parameters.humidity.value else 'N/A' }}%
+                            </h4>
+                            <small>{{ report.analysis.parameters.humidity.message }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted">CO₂</h6>
+                            <h4 class="text-{{ report.analysis.parameters.co2.status|status_class }}">
+                                {{ "%.0f"|format(report.analysis.parameters.co2.value) if report.analysis.parameters.co2.value else 'N/A' }} ppm
+                            </h4>
+                            <small>{{ report.analysis.parameters.co2.message }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 border rounded">
+                            <h6 class="text-muted">Пыль</h6>
+                            <h4 class="text-{{ report.analysis.parameters.dust.status|status_class }}">
+                                {{ "%.2f"|format(report.analysis.parameters.dust.value) if report.analysis.parameters.dust.value else 'N/A' }} мг/м³
+                            </h4>
+                            <small>{{ report.analysis.parameters.dust.message }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                {% if report.analysis.issues %}
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> Выявленные проблемы:</h6>
+                    <ul class="mb-0">
+                        {% for issue in report.analysis.issues %}
+                        <li>{{ issue }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-gear"></i> Эффективность оборудования</h6>
+                        <p>
+                            <strong>Всего оборудования:</strong> {{ report.efficiency.total_equipment }}<br>
+                            <strong>Активно:</strong> {{ report.efficiency.active_equipment }}
+                        </p>
+                        {% if report.efficiency.recommendations %}
+                        <h6>Рекомендации:</h6>
+                        <ul>
+                            {% for recommendation in report.efficiency.recommendations %}
+                            <li>{{ recommendation }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-success"><i class="bi bi-check-circle"></i> Оборудование работает корректно</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-info-circle"></i> Информация о помещении</h6>
+                        <p>
+                            <strong>Площадь:</strong> {{ report.room.area }} м²<br>
+                            <strong>Описание:</strong> {{ report.room.description or 'Не указано' }}<br>
+                            <strong>Дата создания:</strong> {{ report.room.created_at|format_datetime }}
+                        </p>
+                        <a href="{{ url_for('room_detail', room_id=report.room.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% if not reports %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Нет данных для формирования отчётов. 
+            <a href="{{ url_for('rooms') }}" class="alert-link">Создайте помещения и добавьте датчики</a>.
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

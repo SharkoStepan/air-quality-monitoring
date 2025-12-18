@@ -1,0 +1,242 @@
+/* Общие стили */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+/* Карточки */
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+.card-header {
+    font-weight: 600;
+    border-bottom: 2px solid rgba(0,0,0,.05);
+}
+
+/* Статусные бэйджи */
+.badge {
+    padding: 0.4em 0.8em;
+    font-weight: 500;
+}
+
+/* Таблицы */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Кнопки */
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.875rem;
+}
+
+/* Алерты */
+.alert {
+    border: none;
+    border-left: 4px solid;
+    border-radius: 0.375rem;
+}
+
+.alert-info {
+    border-left-color: #0dcaf0;
+    background-color: #e7f6fd;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.alert-success {
+    border-left-color: #198754;
+    background-color: #d1e7dd;
+}
+
+/* Цветовые классы для текста */
+.text-success { color: #198754 !important; }
+.text-danger { color: #dc3545 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-info { color: #0dcaf0 !important; }
+.text-secondary { color: #6c757d !important; }
+
+/* Модальные окна */
+.modal-content {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+/* Футер */
+footer {
+    margin-top: auto;
+    box-shadow: 0 -2px 4px rgba(0,0,0,.05);
+}
+
+/* Карточки показателей на главной */
+.card.text-white .card-body {
+    padding: 1.5rem;
+}
+
+.card.text-white h2 {
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+/* Специальные стили для статусов */
+.border-success { border-color: #198754 !important; border-width: 2px !important; }
+.border-warning { border-color: #ffc107 !important; border-width: 2px !important; }
+.border-danger { border-color: #dc3545 !important; border-width: 2px !important; }
+.border-info { border-color: #0dcaf0 !important; border-width: 2px !important; }
+
+/* Улучшение форм */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .alert {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Графики */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+}
+
+canvas {
+    max-width: 100%;
+}
+
+/* Дополнительные утилиты */
+.rounded {
+    border-radius: 0.375rem !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0,0,0,.08) !important;
+}
+
+.border-2 {
+    border-width: 2px !important;
+}
+
+/* Улучшенные иконки */
+.bi {
+    vertical-align: -0.125em;
+}
+
+/* Loader для загрузки */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* Чекбоксы */
+input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    cursor: pointer;
+}
+
+/* Улучшение читаемости */
+p, li {
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+}

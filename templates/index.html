@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Система мониторинга{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="bi bi-wind"></i> Система мониторинга качества воздуха</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-door-open"></i> Помещений</h5>
+                <h2 class="card-text">{{ rooms|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-thermometer"></i> Датчиков</h5>
+                <h2 class="card-text">{{ total_sensors }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-gear"></i> Оборудования</h5>
+                <h2 class="card-text">{{ total_equipment }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-building"></i> Список помещений</h4>
+            </div>
+            <div class="card-body">
+                {% if rooms %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Площадь (м²)</th>
+                                <th>Описание</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for room in rooms %}
+                            <tr>
+                                <td><strong>{{ room.name }}</strong></td>
+                                <td>{{ room.area }}</td>
+                                <td>{{ room.description or '-' }}</td>
+                                <td>
+                                    <a href="{{ url_for('room_detail', room_id=room.id) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Подробнее
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Помещений пока нет. 
+                    <a href="{{ url_for('rooms') }}" class="alert-link">Создайте первое помещение</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5><i class="bi bi-people"></i> Пользователи системы</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Специалист службы контролирования</strong><br>
+                        <small class="text-muted">Контроль микроклимата, корректирующие действия</small>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Проектировщик систем микроклимата</strong><br>
+                        <small class="text-muted">Проектирование конфигурации оборудования</small>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Менеджер по эксплуатации</strong><br>
+                        <small class="text-muted">Управление эксплуатацией оборудования</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5><i class="bi bi-diagram-3"></i> Структура системы</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="bi bi-reception-4"></i> <strong>Подсистема сбора данных</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-database"></i> <strong>Подсистема хранения и обработки</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-graph-up"></i> <strong>Подсистема анализа и оценки</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-cpu"></i> <strong>Подсистема принятия решений</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-display"></i> <strong>Интерфейсная подсистема</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

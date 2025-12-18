@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room.name }} - Детали{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-door-open"></i> {{ room.name }}
+            <span class="badge bg-{{ analysis.overall_status|status_class }}">
+                {{ analysis.overall_status }}
+            </span>
+        </h1>
+        <p class="text-muted">Площадь: {{ room.area }} м² | {{ room.description or 'Без описания' }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card border-{% if analysis.parameters.temperature.status == 'optimal' %}success{% else %}warning{% endif %}">
+            <div class="card-body text-center">
+                <h6><i class="bi bi-thermometer"></i> Температура</h6>
+                <h3>{{ "%.1f"|format(analysis.parameters.temperature.value) if analysis.parameters.temperature.value else 'N/A' }}°C</h3>
+                <small class="text-muted">{{ analysis.parameters.temperature.message }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-{% if analysis.parameters.humidity.status == 'optimal' %}success{% else %}warning{% endif %}">
+            <div class="card-body text-center">
+                <h6><i class="bi bi-droplet"></i> Влажность</h6>
+                <h3>{{ "%.1f"|format(analysis.parameters.humidity.value) if analysis.parameters.humidity.value else 'N/A' }}%</h3>
+                <small class="text-muted">{{ analysis.parameters.humidity.message }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-{% if analysis.parameters.co2.status == 'optimal' %}success{% else %}warning{% endif %}">
+            <div class="card-body text-center">
+                <h6><i class="bi bi-cloud"></i> CO₂</h6>
+                <h3>{{ "%.0f"|format(analysis.parameters.co2.value) if analysis.parameters.co2.value else 'N/A' }} ppm</h3>
+                <small class="text-muted">{{ analysis.parameters.co2.message }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-{% if analysis.parameters.dust.status == 'optimal' %}success{% else %}warning{% endif %}">
+            <div class="card-body text-center">
+                <h6><i class="bi bi-wind"></i> Пыль</h6>
+                <h3>{{ "%.2f"|format(analysis.parameters.dust.value) if analysis.parameters.dust.value else 'N/A' }} мг/м³</h3>
+                <small class="text-muted">{{ analysis.parameters.dust.message }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if analysis.issues %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <h5><i class="bi bi-exclamation-triangle"></i> Обнаруженные проблемы:</h5>
+            <ul class="mb-0">
+                {% for issue in analysis.issues %}
+                <li>{{ issue }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5><i class="bi bi-reception-4"></i> Датчики</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-sm btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+                    <i class="bi bi-plus"></i> Добавить датчик
+                </button>
+                {% if sensors %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Расположение</th>
+                            <th>Статус</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sensor in sensors %}
+                        <tr>
+                            <td>{{ sensor.sensor_type }}</td>
+                            <td>{{ sensor.location or '-' }}</td>
+                            <td><span class="badge bg-success">{{ sensor.status }}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                                        data-bs-target="#addMeasurementModal" 
+                                        onclick="setSensorId({{ sensor.id }})">
+                                    <i class="bi bi-plus-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">Датчиков нет</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5><i class="bi bi-gear"></i> Оборудование</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-sm btn-success mb-3" onclick="makeDecision({{ room.id }})">
+                    <i class="bi bi-cpu"></i> Принять решение
+                </button>
+                {% if equipment %}
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Тип</th>
+                            <th>Мощность</th>
+                            <th>Статус</th>
+                            <th>Авто</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipment %}
+                        <tr>
+                            <td>{{ eq.name }}</td>
+                            <td>{{ eq.equipment_type }}</td>
+                            <td>{{ eq.power or '-' }}W</td>
+                            <td>
+                                <span class="badge bg-{% if eq.status == 'on' %}success{% else %}secondary{% endif %}">
+                                    {{ eq.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <input type="checkbox" {% if eq.auto_mode %}checked{% endif %} 
+                                       onchange="toggleAuto({{ eq.id }}, this.checked)">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">Оборудования нет</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно добавления датчика -->
+<div class="modal fade" id="addSensorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить датчик</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addSensorForm">
+                    <input type="hidden" id="sensorRoomId" value="{{ room.id }}">
+                    <div class="mb-3">
+                        <label for="sensorType" class="form-label">Тип датчика</label>
+                        <select class="form-control" id="sensorType" required>
+                            <option value="temperature">Температура</option>
+                            <option value="humidity">Влажность</option>
+                            <option value="co2">CO₂</option>
+                            <option value="dust">Пыль</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sensorLocation" class="form-label">Расположение</label>
+                        <input type="text" class="form-control" id="sensorLocation">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="addSensor()">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно добавления измерения -->
+<div class="modal fade" id="addMeasurementModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить измерение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMeasurementForm">
+                    <input type="hidden" id="measurementSensorId">
+                    <div class="mb-3">
+                        <label for="measurementValue" class="form-label">Значение</label>
+                        <input type="number" step="0.01" class="form-control" id="measurementValue" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="addMeasurement()">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentSensorId = null;
+
+function setSensorId(sensorId) {
+    currentSensorId = sensorId;
+    document.getElementById('measurementSensorId').value = sensorId;
+}
+
+function addSensor() {
+    const data = {
+        room_id: document.getElementById('sensorRoomId').value,
+        sensor_type: document.getElementById('sensorType').value,
+        location: document.getElementById('sensorLocation').value
+    };
+    
+    fetch('/api/sensors', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Ошибка: ' + result.error);
+        }
+    });
+}
+
+function addMeasurement() {
+    const data = {
+        sensor_id: document.getElementById('measurementSensorId').value,
+        value: document.getElementById('measurementValue').value
+    };
+    
+    fetch('/api/measurements', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Ошибка: ' + result.error);
+        }
+    });
+}
+
+function makeDecision(roomId) {
+    fetch(`/api/decisions/${roomId}?execute=true`, {method: 'POST'})
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('Решение принято и выполнено!\n\nДействия: ' + 
+                  result.decision.actions.length + '\nРекомендации: ' + 
+                  result.decision.recommendations.join('\n'));
+            location.reload();
+        } else {
+            alert('Ошибка: ' + result.error);
+        }
+    });
+}
+
+function toggleAuto(equipmentId, autoMode) {
+    fetch(`/api/equipment/${equipmentId}/status`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: 'off', auto_mode: autoMode})
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (!result.success) {
+            alert('Ошибка: ' + result.error);
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
